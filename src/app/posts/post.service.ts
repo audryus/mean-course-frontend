@@ -2,6 +2,8 @@ import { Subject } from "rxjs";
 import { map } from 'rxjs/operators'
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
+import { Router } from "@angular/router";
+
 import { Post, PostMessage } from "./post.model";
 
 @Injectable({ providedIn: "root" })
@@ -11,7 +13,7 @@ export class PostService {
 
   private api: string = "http://localhost:3000/api/post/"
 
-  constructor(private httpClient: HttpClient) {}
+  constructor(private httpClient: HttpClient, private route: Router) {}
 
   getListener() {
     return this.postSubject.asObservable();
@@ -49,31 +51,37 @@ export class PostService {
       });
   }
 
-  save(post: Post) {
+  save(post: Post, callbackRouter?: Function) {
     if (post.id != null) {
-      this.update(post)
+      this.update(post, callbackRouter)
     } else {
-      this.add(post)
+      this.add(post, callbackRouter)
     }
   }
 
-  update(post: Post) {
+  update(post: Post, callbackRouter?: Function) {
     this.httpClient.patch(this.api+post.id, post)
       .subscribe(response => {
         // const updatedPosts = [...this.posts]
         // const oldPosIndex = this.posts.findIndex(p => p.id === post.id)
         // updatedPosts[oldPosIndex] = post
         // this.posts = updatedPosts
-        // this.next()
+        this.next()
+        if (callbackRouter) {
+          callbackRouter(this.route);
+        }
       })
   }
 
-  add(post: Post) {
+  add(post: Post, callbackRouter?: Function) {
     this.httpClient
       .post<PostMessage>(this.api, post)
       .subscribe(response => {
         this.posts.push(response.posts[0]);
         this.next();
+        if (callbackRouter) {
+          callbackRouter(this.route);
+        }
       })
   }
 
