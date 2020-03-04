@@ -20,7 +20,8 @@ export class PostCreateComponent {
       title: form.value.title,
       content: form.value.content
     };
-    this.postService.addPost(post);
+    this.postService.add(post);
+    form.resetForm();
   }
   getInputError(inputField: NgModel) {
     let error = ""
