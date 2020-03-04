@@ -17,18 +17,27 @@ export class PostService {
     return this.postSubject.asObservable();
   }
 
+  map(post:any): Post {
+    return {
+      title: post.title,
+      content: post.content,
+      id: post._id
+    }
+  }
+
   private mapper(document: PostMessage):Post[] {
     return document.posts.map(post => {
-      return {
-        title: post.title,
-        content: post.content,
-        id: post._id
-      }
+      return this.map(post)
     })
   }
 
   private next() {
     this.postSubject.next([...this.posts]);
+  }
+
+
+  findById(postId: string) {
+    return this.httpClient.get<PostMessage>(this.api +postId)
   }
 
   findAll() {
@@ -39,6 +48,26 @@ export class PostService {
         this.next();
       });
   }
+
+  save(post: Post) {
+    if (post.id != null) {
+      this.update(post)
+    } else {
+      this.add(post)
+    }
+  }
+
+  update(post: Post) {
+    this.httpClient.patch(this.api+post.id, post)
+      .subscribe(response => {
+        // const updatedPosts = [...this.posts]
+        // const oldPosIndex = this.posts.findIndex(p => p.id === post.id)
+        // updatedPosts[oldPosIndex] = post
+        // this.posts = updatedPosts
+        // this.next()
+      })
+  }
+
   add(post: Post) {
     this.httpClient
       .post<PostMessage>(this.api, post)

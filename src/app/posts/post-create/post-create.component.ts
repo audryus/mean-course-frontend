@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
+import { Component, OnInit } from "@angular/core";
 import { NgForm, NgModel } from "@angular/forms";
+import { ActivatedRoute, ParamMap } from "@angular/router";
 
 import { Post } from "../post.model";
 import { PostService } from '../post.service';
@@ -9,18 +10,41 @@ import { PostService } from '../post.service';
   templateUrl: "./post-create.component.html",
   styleUrls: ["./post-create.component.css"]
 })
-export class PostCreateComponent {
-  constructor(public postService: PostService){}
+export class PostCreateComponent implements OnInit {
+  post:Post
 
-  onAddPost(form: NgForm) {
-    if (form.invalid)
+  private currentState: PostMode = PostMode.Create
+
+  constructor(public postService: PostService, public route: ActivatedRoute){}
+
+  ngOnInit() {
+    this.route.paramMap.subscribe((paramMap: ParamMap) => {
+      // Reseting state ...
+      this.currentState = PostMode.Create
+
+      if (paramMap.has("postId")) {
+        this.currentState = PostMode.Edit
+        this.postService.findById(paramMap.get("postId")).subscribe(postData => {
+          this.post = this.postService.map(postData.posts[0])
+        })
+      }
+    })
+  }
+
+  onSave(form: NgForm) {
+    if (form.invalid) {
       return;
-
-    const post:Post = {
+    }
+    let tmpPost: Post = {
       title: form.value.title,
       content: form.value.content
     };
-    this.postService.add(post);
+
+    if (this.currentState == PostMode.Edit) {
+      tmpPost.id = this.post.id
+    }
+
+    this.postService.save(tmpPost);
     form.resetForm();
   }
   getInputError(inputField: NgModel) {
@@ -37,4 +61,8 @@ export class PostCreateComponent {
     }
     return error
   }
+}
+
+enum PostMode {
+  Create, Edit
 }
