@@ -23,17 +23,28 @@ export class PostService {
     return {
       title: post.title,
       content: post.content,
-      id: post._id
+      id: post._id,
+      imagePath: post.imagePath,
+      image: post.imagePath
     }
   }
 
-  toData(post: Post): FormData {
-    const data = new FormData();
-    data.append("title", post.title);
-    data.append("content", post.content);
-    data.append("id", post.id);
-    data.append("image", post.image, post.title);
+  toData(post: Post): FormData | Post {
+    let data:FormData | Post;
+    if (typeof post.image === "object") {
+      data = new FormData();
+      data.append("title", post.title);
+      data.append("content", post.content);
+      data.append("id", post.id);
+      data.append("image", post.image, post.title);
+    } else {
+      data = {
+        ...post,
+        imagePath: post.image
+      }
+    }
     return data;
+    
   }
 
   private mapper(document: PostMessage):Post[] {
@@ -69,7 +80,8 @@ export class PostService {
   }
 
   update(post: Post, callbackRouter?: Function) {
-    this.httpClient.patch(this.api+post.id, post)
+    const postData = this.toData(post);
+    this.httpClient.patch(this.api+post.id, postData)
       .subscribe(response => {
         // const updatedPosts = [...this.posts]
         // const oldPosIndex = this.posts.findIndex(p => p.id === post.id)
@@ -84,7 +96,6 @@ export class PostService {
 
   add(post: Post, callbackRouter?: Function) {
     const postData = this.toData(post);
-    console.log(postData)
     this.httpClient
       .post<PostMessage>(this.api, postData)
       .subscribe(response => {
