@@ -4,6 +4,7 @@ import { ActivatedRoute, ParamMap, Router } from "@angular/router";
 
 import { Post } from "../post.model";
 import { PostService } from "../post.service";
+import { mimeType } from "./mime-type.validator";
 
 @Component({
   selector: "app-post-create",
@@ -12,6 +13,7 @@ import { PostService } from "../post.service";
 })
 export class PostCreateComponent implements OnInit {
   form: FormGroup;
+  imagePreview: string;
   post: Post;
   isLoading: boolean = false;
 
@@ -26,7 +28,11 @@ export class PostCreateComponent implements OnInit {
       }),
       "content": new FormControl(null, {
         validators: [Validators.required]
-      })
+      }),
+      "image": new FormControl(null, {
+        validators: [Validators.required],
+        asyncValidators: [mimeType]
+      }),
     });
 
     this.isLoading = true;
@@ -66,6 +72,7 @@ export class PostCreateComponent implements OnInit {
     if (this.currentState == PostMode.Edit) {
       tmpPost.id = this.post.id;
     }
+    console.log(tmpPost)
 
     this.postService.save(tmpPost, this.callbackRoute);
     this.form.reset();
@@ -86,6 +93,21 @@ export class PostCreateComponent implements OnInit {
       error = fieldName + " is Required";
     }
     return error;
+  }
+
+  onImagePick(event: Event) {
+    const file = (event.target as HTMLInputElement).files[0];
+
+    this.form.patchValue({
+      "image": file
+    });
+
+    this.form.get("image").updateValueAndValidity();
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 }
 

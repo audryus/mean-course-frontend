@@ -27,6 +27,15 @@ export class PostService {
     }
   }
 
+  toData(post: Post): FormData {
+    const data = new FormData();
+    data.append("title", post.title);
+    data.append("content", post.content);
+    data.append("id", post.id);
+    data.append("image", post.image, post.title);
+    return data;
+  }
+
   private mapper(document: PostMessage):Post[] {
     return document.posts.map(post => {
       return this.map(post)
@@ -74,8 +83,10 @@ export class PostService {
   }
 
   add(post: Post, callbackRouter?: Function) {
+    const postData = this.toData(post);
+    console.log(postData)
     this.httpClient
-      .post<PostMessage>(this.api, post)
+      .post<PostMessage>(this.api, postData)
       .subscribe(response => {
         this.posts.push(response.posts[0]);
         this.next();
