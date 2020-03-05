@@ -4,7 +4,7 @@ import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Router } from "@angular/router";
 
-import { Post, PostMessage } from "./post.model";
+import { Post, PostMessage, PostPaginator } from "./post.model";
 
 @Injectable({ providedIn: "root" })
 export class PostService {
@@ -47,7 +47,10 @@ export class PostService {
     
   }
 
-  private mapper(document: PostMessage):Post[] {
+  private mapper(document: PostMessage, paginator?: PostPaginator):Post[] {
+    if (paginator) {
+      paginator.totalPosts = document.count;
+    }
     return document.posts.map(post => {
       return this.map(post)
     })
@@ -62,9 +65,16 @@ export class PostService {
     return this.httpClient.get<PostMessage>(this.api +postId)
   }
 
-  findAll() {
-    this.httpClient.get<PostMessage>(this.api)
-      .pipe(map((postData) => this.mapper(postData)))
+  findAll(paginator?: PostPaginator) {
+    var findUrl = this.api;
+
+    if (paginator) {
+      const queryParams = `?pagesize=${paginator.postsPerPage}&page=${paginator.currentPage}`;
+      findUrl += queryParams
+    }
+
+    this.httpClient.get<PostMessage>(findUrl)
+      .pipe(map((postData) => this.mapper(postData, paginator)))
       .subscribe((pipedPosts) => {
         this.posts = pipedPosts
         this.next();
@@ -108,11 +118,6 @@ export class PostService {
   }
 
   delete(postId: string) {
-    this.httpClient.delete(this.api +postId)
-      .subscribe(()=> {
-        const updatedPosts = this.posts.filter(post => post.id !== postId)
-        this.posts = updatedPosts
-        this.next()
-      })
+    return this.httpClient.delete(this.api +postId);
   }
 }

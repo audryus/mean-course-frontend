@@ -8,4 +8,11 @@ export interface Post {
 export interface PostMessage {
   message: string;
   posts: any;
+  count?: number;
+}
+export interface PostPaginator {
+  postsPerPage: number;
+  currentPage: number;
+  totalPosts: number;
+  pageSizeOptions: Array<number>;
 }

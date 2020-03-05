@@ -65,16 +65,11 @@ export class PostCreateComponent implements OnInit {
     }
 
     this.isLoading = true;
-    // let tmpPost: Post = {
-    //   title: this.form.value.title,
-    //   content: this.form.value.content
-    // };
     let tmpPost: Post = this.form.value;
 
     if (this.currentState == PostMode.Edit) {
       tmpPost.id = this.post.id;
     }
-    console.log(tmpPost)
 
     this.postService.save(tmpPost, this.callbackRoute);
     this.form.reset();
@@ -88,11 +83,10 @@ export class PostCreateComponent implements OnInit {
     }
 
     if (inputField.errors.minlength) {
-      error =
-        "Minimum title length is " + inputField.errors.minlength.requiredLength;
+      error = `Minimum title length is ${inputField.errors.minlength.requiredLength}`;
     }
     if (inputField.errors.required) {
-      error = fieldName + " is Required";
+      error = `${fieldName} is Required`;
     }
     return error;
   }
