@@ -30,7 +30,10 @@ export class AuthService {
     }
 
     signup(user:AuthData) {
-        this.httpClient.post(`${this.api}/sign/up`, user).subscribe(res => {
+        this.httpClient.post(`${this.api}/sign/up`, user).subscribe(() => {
+            this.route.navigate(['/']);
+        }, error => {
+            this.authStatusListener.next(false);
         })
     }
 
@@ -50,6 +53,8 @@ export class AuthService {
                 this.saveAuthData(this.token, new Date(now.getTime() + res.expiresIn* 1000), this.userId);
                 this.route.navigate(['/']);
             }
+        }, error => {
+            this.authStatusListener.next(false);
         })
     }
 
