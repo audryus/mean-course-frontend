@@ -3,12 +3,12 @@ import { HttpClient } from "@angular/common/http";
 import { AuthData, AuthMessage } from './auth.model';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
-import { THIS_EXPR } from '@angular/compiler/src/output/output_ast';
+import { getApiEndpoint } from 'src/environments/environment';
 
 
 @Injectable({ providedIn: "root" })
 export class AuthService {
-    private api: string = "http://localhost:3000/api/user/";
+    private api: string = getApiEndpoint("user");
     private isAuthenticated: boolean = false;
     private userId: string;
     private token: string = "";
@@ -30,7 +30,7 @@ export class AuthService {
     }
 
     signup(user:AuthData) {
-        this.httpClient.post(`${this.api}/sign/up`, user).subscribe(() => {
+        this.httpClient.post(`${this.api}signup`, user).subscribe(() => {
             this.route.navigate(['/']);
         }, error => {
             this.authStatusListener.next(false);
@@ -42,7 +42,7 @@ export class AuthService {
     }
 
     signin(user:AuthData) {
-        this.httpClient.post<AuthMessage>(`${this.api}/sign/in`, user).subscribe(res => {
+        this.httpClient.post<AuthMessage>(`${this.api}signin`, user).subscribe(res => {
             this.token = res.token;
             if (this.token) {
                 this.isAuthenticated = true;

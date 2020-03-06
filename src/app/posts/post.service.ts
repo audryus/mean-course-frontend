@@ -6,12 +6,14 @@ import { Router } from "@angular/router";
 
 import { Post, PostMessage, PostPaginator } from "./post.model";
 
+import { getApiEndpoint } from "../../environments/environment";
+
 @Injectable({ providedIn: "root" })
 export class PostService {
   private posts: Post[] = [];
   private postSubject = new Subject<Post[]>();
 
-  private api: string = "http://localhost:3000/api/post/"
+  private api: string = getApiEndpoint("post");
 
   constructor(private httpClient: HttpClient, private route: Router) {}
 
