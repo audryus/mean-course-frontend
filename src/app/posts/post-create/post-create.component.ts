@@ -35,6 +35,7 @@ export class PostCreateComponent implements OnInit {
         validators: [Validators.required],
         asyncValidators: [mimeType]
       }),
+      "creator": new FormControl(null),
     });
 
     this.isLoading = true;

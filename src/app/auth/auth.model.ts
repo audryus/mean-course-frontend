@@ -6,5 +6,6 @@ export interface AuthData {
 export interface AuthMessage {
     token?: string;
     expiresIn?: number;
+    userId?: string;
     expirationDate?: Date;
 }

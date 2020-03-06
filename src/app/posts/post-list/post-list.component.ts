@@ -17,6 +17,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   paginator: PostPaginator;
   isLoading: boolean = false;
   isAuth: boolean = false;
+  userId: string;
 
   private postSub: Subscription;
   private authSub: Subscription;
@@ -25,6 +26,7 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.isLoading = true;
+    this.userId = this.authService.getUserId();
     this.paginator = {
       postsPerPage: 1,
       currentPage: 1,
@@ -43,6 +45,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     this.isAuth = this.authService.isAuth();
     this.authSub = this.authService.getListener().subscribe(isAuthenticated => {
       this.isAuth = isAuthenticated;
+      this.userId = this.authService.getUserId();
     })
   }
 

@@ -25,7 +25,8 @@ export class PostService {
       content: post.content,
       id: post._id,
       imagePath: post.imagePath,
-      image: post.imagePath
+      image: post.imagePath,
+      creator: post.creator
     }
   }
 
@@ -76,7 +77,7 @@ export class PostService {
     this.httpClient.get<PostMessage>(findUrl)
       .pipe(map((postData) => this.mapper(postData, paginator)))
       .subscribe((pipedPosts) => {
-        this.posts = pipedPosts
+        this.posts = pipedPosts;
         this.next();
       });
   }

@@ -4,6 +4,7 @@ export interface Post {
   content: string;
   image?: File | string;
   imagePath?: string;
+  creator?: string;
 }
 export interface PostMessage {
   message: string;
